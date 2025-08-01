@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 /**
  * Exception thrown when there are configuration-related errors in the EdgeBinder component.
- * 
+ *
  * This exception provides factory methods for common configuration error scenarios
  * with helpful error messages and context information.
  */
@@ -18,6 +18,7 @@ final class ConfigurationException extends InvalidArgumentException
      * Create exception for missing configuration.
      *
      * @param string $reason Reason why configuration is missing
+     *
      * @return self
      */
     public static function missingConfiguration(string $reason): self
@@ -29,6 +30,7 @@ final class ConfigurationException extends InvalidArgumentException
      * Create exception for invalid configuration.
      *
      * @param string $reason Reason why configuration is invalid
+     *
      * @return self
      */
     public static function invalidConfiguration(string $reason): self
@@ -40,6 +42,7 @@ final class ConfigurationException extends InvalidArgumentException
      * Create exception for unconfigured instance.
      *
      * @param string $instanceName Name of the instance that is not configured
+     *
      * @return self
      */
     public static function instanceNotConfigured(string $instanceName): self
@@ -54,6 +57,7 @@ final class ConfigurationException extends InvalidArgumentException
      * Create exception for unsupported adapter type.
      *
      * @param string $adapterType The unsupported adapter type
+     *
      * @return self
      */
     public static function unsupportedAdapter(string $adapterType): self
@@ -68,6 +72,7 @@ final class ConfigurationException extends InvalidArgumentException
      * Create exception for missing service in container.
      *
      * @param string $serviceName Name of the missing service
+     *
      * @return self
      */
     public static function missingService(string $serviceName): self
@@ -83,6 +88,7 @@ final class ConfigurationException extends InvalidArgumentException
      *
      * @param string $serviceName Name of the service
      * @param string $reason Reason why the service is invalid
+     *
      * @return self
      */
     public static function invalidService(string $serviceName, string $reason): self
@@ -99,6 +105,7 @@ final class ConfigurationException extends InvalidArgumentException
      *
      * @param array<string> $missingKeys Array of missing configuration keys
      * @param string $context Context where the keys are missing (e.g., 'adapter configuration')
+     *
      * @return self
      */
     public static function missingRequiredKeys(array $missingKeys, string $context = 'configuration'): self
@@ -116,6 +123,7 @@ final class ConfigurationException extends InvalidArgumentException
      * @param string $key Configuration key
      * @param mixed $value Invalid value
      * @param string $expectedType Expected type or description
+     *
      * @return self
      */
     public static function invalidConfigurationValue(string $key, mixed $value, string $expectedType): self

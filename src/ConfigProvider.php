@@ -9,7 +9,7 @@ use EdgeBinder\EdgeBinder;
 
 /**
  * Configuration provider for EdgeBinder Laminas component.
- * 
+ *
  * Registers all necessary services and factories for EdgeBinder integration
  * with Laminas/Mezzio applications.
  */
@@ -24,6 +24,7 @@ final class ConfigProvider
     {
         return [
             'dependencies' => $this->getDependencies(),
+            'edgebinder' => $this->getEdgeBinderConfig(),
         ];
     }
 
@@ -38,11 +39,9 @@ final class ConfigProvider
             'factories' => [
                 // Main EdgeBinder service
                 EdgeBinder::class => EdgeBinderFactory::class,
-                
+
                 // Named EdgeBinder instances
                 'edgebinder.default' => EdgeBinderFactory::class,
-                
-
             ],
             'aliases' => [
                 'EdgeBinder' => EdgeBinder::class,
@@ -51,5 +50,21 @@ final class ConfigProvider
         ];
     }
 
-
+    /**
+     * Returns the default EdgeBinder configuration.
+     *
+     * @return array<string, mixed>
+     */
+    public function getEdgeBinderConfig(): array
+    {
+        return [
+            // Default configuration can be overridden by local config
+            'adapter' => 'weaviate',
+            'weaviate_client' => 'weaviate.client.default',
+            'collection_name' => 'EdgeBindings',
+            'schema' => [
+                'auto_create' => true,
+            ],
+        ];
+    }
 }

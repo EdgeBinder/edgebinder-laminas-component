@@ -1,0 +1,142 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.3', '8.4']
+        servicemanager-version: ['3.0', '4.0']
+        psr-container-version: ['1.0', '2.0']
+        include:
+          # Test with lowest dependencies
+          - php-version: '8.3'
+            servicemanager-version: '3.0'
+            psr-container-version: '1.0'
+            dependencies: 'lowest'
+          # Test with highest dependencies
+          - php-version: '8.4'
+            servicemanager-version: '4.0'
+            psr-container-version: '2.0'
+            dependencies: 'highest'
+
+    name: PHP ${{ matrix.php-version }} - ServiceManager ${{ matrix.servicemanager-version }} - PSR-11 ${{ matrix.psr-container-version }}
+
+    services:
+      weaviate:
+        image: semitechnologies/weaviate:1.25.0
+        ports:
+          - 8080:8080
+        env:
+          QUERY_DEFAULTS_LIMIT: 25
+          AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+          PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+          DEFAULT_VECTORIZER_MODULE: 'none'
+          ENABLE_MODULES: ''
+          CLUSTER_HOSTNAME: 'node1'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json, pcre, spl, tokenizer, zip
+        coverage: xdebug
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-${{ matrix.php-version }}-
+
+    - name: Install dependencies
+      run: |
+        if [[ "${{ matrix.dependencies }}" == "lowest" ]]; then
+          composer update --prefer-lowest --no-interaction --no-progress --prefer-dist
+        elif [[ "${{ matrix.dependencies }}" == "highest" ]]; then
+          composer update --no-interaction --no-progress --prefer-dist
+        else
+          composer install --no-interaction --no-progress --prefer-dist
+        fi
+
+    - name: Install specific ServiceManager version
+      run: |
+        if [[ "${{ matrix.servicemanager-version }}" == "3.0" ]]; then
+          composer require "laminas/laminas-servicemanager:^3.0" --no-update
+        else
+          composer require "laminas/laminas-servicemanager:^4.0" --no-update
+        fi
+
+    - name: Install specific PSR Container version
+      run: |
+        if [[ "${{ matrix.psr-container-version }}" == "1.0" ]]; then
+          composer require "psr/container:^1.0" --no-update
+        else
+          composer require "psr/container:^2.0" --no-update
+        fi
+
+    - name: Update dependencies after version constraints
+      run: composer update --no-interaction --no-progress --prefer-dist
+
+    - name: Wait for Weaviate to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:8080/v1/.well-known/ready; do sleep 2; done'
+
+    - name: Run unit tests
+      run: composer run-script test-unit
+
+    - name: Run integration tests
+      run: composer run-script test-integration
+      env:
+        WEAVIATE_HOST: localhost
+        WEAVIATE_PORT: 8080
+        WEAVIATE_SCHEME: http
+
+    - name: Run compatibility tests
+      run: composer run-script test-compatibility
+
+    - name: Generate coverage report
+      if: matrix.php-version == '8.3' && matrix.servicemanager-version == '4.0' && matrix.psr-container-version == '2.0'
+      run: composer run-script test-coverage
+
+    - name: Upload coverage reports to Codecov
+      if: matrix.php-version == '8.3' && matrix.servicemanager-version == '4.0' && matrix.psr-container-version == '2.0'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  security-audit:
+    runs-on: ubuntu-latest
+    name: Security Audit
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+
+    - name: Install dependencies
+      run: composer install --no-interaction --no-progress --prefer-dist
+
+    - name: Run security audit
+      run: composer run-script security-audit

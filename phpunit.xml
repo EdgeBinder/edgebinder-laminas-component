@@ -57,5 +57,9 @@
         <ini name="error_reporting" value="-1"/>
         <ini name="memory_limit" value="-1"/>
         <env name="PHPUNIT_RUNNING" value="1"/>
+        <env name="WEAVIATE_HOST" value="localhost"/>
+        <env name="WEAVIATE_PORT" value="8080"/>
+        <env name="WEAVIATE_SCHEME" value="http"/>
+        <env name="EDGEBINDER_TEST_MODE" value="true"/>
     </php>
 </phpunit>

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test case for ConfigurationException class.
- * 
+ *
  * @covers \EdgeBinder\Component\Exception\ConfigurationException
  */
 final class ConfigurationExceptionTest extends TestCase
@@ -18,7 +18,7 @@ final class ConfigurationExceptionTest extends TestCase
     public function testExtendsInvalidArgumentException(): void
     {
         $exception = ConfigurationException::missingConfiguration('test reason');
-        
+
         $this->assertInstanceOf(InvalidArgumentException::class, $exception);
         $this->assertInstanceOf(ConfigurationException::class, $exception);
     }

@@ -1,7 +1,7 @@
 # EdgeBinder Laminas Component
 
-[![Build Status](https://github.com/EdgeBinder/edgebinder-component/workflows/Tests/badge.svg)](https://github.com/EdgeBinder/edgebinder-component/actions)
-[![Code Quality](https://github.com/EdgeBinder/edgebinder-component/workflows/Code%20Quality/badge.svg)](https://github.com/EdgeBinder/edgebinder-component/actions)
+[![Tests](https://github.com/EdgeBinder/edgebinder-component/workflows/Tests/badge.svg)](https://github.com/EdgeBinder/edgebinder-component/actions?query=workflow%3ATests)
+[![Lint](https://github.com/EdgeBinder/edgebinder-component/workflows/Lint/badge.svg)](https://github.com/EdgeBinder/edgebinder-component/actions?query=workflow%3ALint)
 [![Coverage Status](https://codecov.io/gh/EdgeBinder/edgebinder-component/branch/main/graph/badge.svg)](https://codecov.io/gh/EdgeBinder/edgebinder-component)
 [![Latest Stable Version](https://poser.pugx.org/edgebinder/laminas-component/v/stable)](https://packagist.org/packages/edgebinder/laminas-component)
 [![Total Downloads](https://poser.pugx.org/edgebinder/laminas-component/downloads)](https://packagist.org/packages/edgebinder/laminas-component)

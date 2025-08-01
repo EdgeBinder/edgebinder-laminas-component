@@ -13,7 +13,7 @@ use Psr\Container\ContainerInterface;
 
 /**
  * Factory for creating EdgeBinder instances with support for multiple named configurations.
- * 
+ *
  * This factory supports:
  * - Single instance creation (default)
  * - Multiple named instances
@@ -29,7 +29,9 @@ final class EdgeBinderFactory implements FactoryInterface
      * @param ContainerInterface $container
      * @param string $requestedName
      * @param array<string, mixed>|null $options
+     *
      * @return EdgeBinder
+     *
      * @throws ConfigurationException
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): EdgeBinder
@@ -42,17 +44,19 @@ final class EdgeBinderFactory implements FactoryInterface
      *
      * @param ContainerInterface $container
      * @param string $name Configuration name (e.g., 'default', 'rag', 'analytics')
+     *
      * @return EdgeBinder
+     *
      * @throws ConfigurationException
      */
     public function createEdgeBinder(ContainerInterface $container, string $name = 'default'): EdgeBinder
     {
         $config = $this->getConfiguration($container);
         $instanceConfig = $this->getInstanceConfiguration($config, $name);
-        
+
         // Get the appropriate adapter
         $adapter = $this->createAdapter($container, $instanceConfig, $config);
-        
+
         return new EdgeBinder($adapter);
     }
 
@@ -60,7 +64,9 @@ final class EdgeBinderFactory implements FactoryInterface
      * Get the EdgeBinder configuration from the container.
      *
      * @param ContainerInterface $container
+     *
      * @return array<string, mixed>
+     *
      * @throws ConfigurationException
      */
     private function getConfiguration(ContainerInterface $container): array
@@ -70,7 +76,7 @@ final class EdgeBinderFactory implements FactoryInterface
         }
 
         $config = $container->get('config');
-        
+
         if (!is_array($config)) {
             throw ConfigurationException::invalidConfiguration('config service must return an array');
         }
@@ -83,7 +89,9 @@ final class EdgeBinderFactory implements FactoryInterface
      *
      * @param array<string, mixed> $config
      * @param string $name
+     *
      * @return array<string, mixed>
+     *
      * @throws ConfigurationException
      */
     private function getInstanceConfiguration(array $config, string $name): array
@@ -92,12 +100,12 @@ final class EdgeBinderFactory implements FactoryInterface
         if (isset($config[$name])) {
             return $config[$name];
         }
-        
+
         // Backward compatibility: use root config as default
         if ($name === 'default' && isset($config['adapter'])) {
             return $config;
         }
-        
+
         throw ConfigurationException::instanceNotConfigured($name);
     }
 
@@ -107,7 +115,9 @@ final class EdgeBinderFactory implements FactoryInterface
      * @param ContainerInterface $container
      * @param array<string, mixed> $instanceConfig
      * @param array<string, mixed> $globalConfig
+     *
      * @return PersistenceAdapterInterface
+     *
      * @throws ConfigurationException
      */
     private function createAdapter(
@@ -120,6 +130,7 @@ final class EdgeBinderFactory implements FactoryInterface
         // Method 1: Check EdgeBinder registry (framework-agnostic)
         if (AdapterRegistry::hasAdapter($adapterType)) {
             $config = $this->buildAdapterConfig($instanceConfig, $globalConfig, $container);
+
             return AdapterRegistry::create($adapterType, $config);
         }
 
@@ -131,15 +142,24 @@ final class EdgeBinderFactory implements FactoryInterface
 
             // Support different factory patterns
             if (is_callable($factory)) {
-                return $factory($config);
+                $result = $factory($config);
+                if ($result instanceof PersistenceAdapterInterface) {
+                    return $result;
+                }
             }
 
-            if (method_exists($factory, 'createAdapter')) {
-                return $factory->createAdapter($config);
+            if (is_object($factory) && method_exists($factory, 'createAdapter')) {
+                $result = $factory->createAdapter($config);
+                if ($result instanceof PersistenceAdapterInterface) {
+                    return $result;
+                }
             }
 
-            if (method_exists($factory, '__invoke')) {
-                return $factory($config);
+            if (is_object($factory) && method_exists($factory, '__invoke')) {
+                $result = $factory($config);
+                if ($result instanceof PersistenceAdapterInterface) {
+                    return $result;
+                }
             }
         }
 
@@ -156,6 +176,7 @@ final class EdgeBinderFactory implements FactoryInterface
      * @param array<string, mixed> $instanceConfig
      * @param array<string, mixed> $globalConfig
      * @param ContainerInterface $container
+     *
      * @return array<string, mixed>
      */
     private function buildAdapterConfig(
@@ -175,7 +196,9 @@ final class EdgeBinderFactory implements FactoryInterface
      *
      * @param ContainerInterface $container
      * @param array<string, mixed> $instanceConfig
+     *
      * @return PersistenceAdapterInterface
+     *
      * @throws ConfigurationException
      */
     private function createWeaviateAdapter(
@@ -187,7 +210,7 @@ final class EdgeBinderFactory implements FactoryInterface
         }
 
         $factory = $container->get(WeaviateAdapterFactory::class);
-        
+
         if (!$factory instanceof WeaviateAdapterFactory) {
             throw ConfigurationException::invalidService(
                 WeaviateAdapterFactory::class,

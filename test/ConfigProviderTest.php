@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test case for ConfigProvider class.
- * 
+ *
  * @covers \EdgeBinder\Component\ConfigProvider
  */
 final class ConfigProviderTest extends TestCase
@@ -42,7 +42,7 @@ final class ConfigProviderTest extends TestCase
         $this->assertArrayHasKey('aliases', $dependencies);
 
         $factories = $dependencies['factories'];
-        
+
         // Test main EdgeBinder service factory
         $this->assertArrayHasKey(EdgeBinder::class, $factories);
         $this->assertSame(EdgeBinderFactory::class, $factories[EdgeBinder::class]);
@@ -96,10 +96,10 @@ final class ConfigProviderTest extends TestCase
     {
         $dependencies = $this->configProvider->getDependencies();
         $factories = $dependencies['factories'];
-        
+
         $factoryCallable = $factories[WeaviateAdapterFactory::class];
         $this->assertIsCallable($factoryCallable);
-        
+
         $factory = $factoryCallable();
         $this->assertInstanceOf(WeaviateAdapterFactory::class, $factory);
     }

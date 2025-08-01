@@ -13,12 +13,13 @@ use Psr\Container\ContainerInterface;
 
 /**
  * Test case for EdgeBinderFactory class.
- * 
+ *
  * @covers \EdgeBinder\Component\Factory\EdgeBinderFactory
  */
 final class EdgeBinderFactoryTest extends TestCase
 {
     private EdgeBinderFactory $factory;
+
     private ContainerInterface $container;
 
     protected function setUp(): void
@@ -233,7 +234,7 @@ final class EdgeBinderFactoryTest extends TestCase
     {
         $factory = $this->createMock(WeaviateAdapterFactory::class);
         $adapter = $this->createMock(\EdgeBinder\Contracts\PersistenceAdapterInterface::class);
-        
+
         $factory
             ->method('createAdapterFromConfig')
             ->willReturn($adapter);
