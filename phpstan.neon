@@ -1,0 +1,20 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - test
+    
+    excludePaths:
+        - test/*/data/*
+    
+    ignoreErrors:
+        # Allow mixed types in test data
+        - '#Parameter \#\d+ \$\w+ of method .+Test::.+ expects .+, mixed given\.#'
+        
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    
+    # Extensions
+    extensions:
+        - vendor/phpstan/phpstan-phpunit/extension.neon
+        - vendor/phpstan/phpstan-strict-rules/rules.neon
