@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace EdgeBinder\Component;
 
 use EdgeBinder\Component\Factory\EdgeBinderFactory;
-use EdgeBinder\Component\Factory\WeaviateAdapterFactory;
 use EdgeBinder\EdgeBinder;
 
 /**
@@ -25,7 +24,6 @@ final class ConfigProvider
     {
         return [
             'dependencies' => $this->getDependencies(),
-            'edgebinder' => $this->getEdgeBinderConfig(),
         ];
     }
 
@@ -44,9 +42,7 @@ final class ConfigProvider
                 // Named EdgeBinder instances
                 'edgebinder.default' => EdgeBinderFactory::class,
                 
-                // Built-in adapter factories
-                WeaviateAdapterFactory::class => static fn(): WeaviateAdapterFactory => new WeaviateAdapterFactory(),
-                'edgebinder.adapter.weaviate.default' => WeaviateAdapterFactory::class,
+
             ],
             'aliases' => [
                 'EdgeBinder' => EdgeBinder::class,
@@ -55,21 +51,5 @@ final class ConfigProvider
         ];
     }
 
-    /**
-     * Returns the default EdgeBinder configuration.
-     *
-     * @return array<string, mixed>
-     */
-    public function getEdgeBinderConfig(): array
-    {
-        return [
-            // Default configuration will be merged with user configuration
-            'adapter' => 'weaviate',
-            'weaviate_client' => 'weaviate.client.default',
-            'collection_name' => 'EdgeBindings',
-            'schema' => [
-                'auto_create' => true,
-            ],
-        ];
-    }
+
 }
