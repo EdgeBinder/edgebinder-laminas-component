@@ -1,0 +1,99 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * EdgeBinder Configuration Template
+ * 
+ * Copy this file to your application's config/autoload/ directory and rename it to:
+ * - edgebinder.global.php (for global configuration)
+ * - edgebinder.local.php (for environment-specific configuration)
+ * 
+ * Then customize the configuration according to your needs.
+ */
+
+return [
+    'edgebinder' => [
+        // Basic single instance configuration
+        'adapter' => 'weaviate',
+        'weaviate_client' => 'weaviate.client.default',
+        'collection_name' => 'EdgeBindings',
+        'schema' => [
+            'auto_create' => true,
+            'vectorizer' => 'text2vec-openai',
+        ],
+
+        // Multiple instance configuration (uncomment and customize as needed)
+        /*
+        'rag' => [
+            'adapter' => 'weaviate',
+            'weaviate_client' => 'weaviate.client.rag',
+            'collection_name' => 'RAGBindings',
+            'schema' => [
+                'auto_create' => true,
+                'vectorizer' => 'text2vec-openai',
+                'properties' => [
+                    'content' => [
+                        'dataType' => ['text'],
+                        'description' => 'Document content',
+                    ],
+                    'metadata' => [
+                        'dataType' => ['object'],
+                        'description' => 'Document metadata',
+                    ],
+                ],
+            ],
+        ],
+        'analytics' => [
+            'adapter' => 'weaviate',
+            'weaviate_client' => 'weaviate.client.analytics',
+            'collection_name' => 'AnalyticsBindings',
+            'schema' => [
+                'auto_create' => true,
+                'properties' => [
+                    'event_type' => [
+                        'dataType' => ['string'],
+                        'description' => 'Type of analytics event',
+                    ],
+                    'timestamp' => [
+                        'dataType' => ['date'],
+                        'description' => 'Event timestamp',
+                    ],
+                    'user_id' => [
+                        'dataType' => ['string'],
+                        'description' => 'User identifier',
+                    ],
+                ],
+            ],
+        ],
+        'social' => [
+            'adapter' => 'weaviate',
+            'weaviate_client' => 'weaviate.client.social',
+            'collection_name' => 'SocialBindings',
+            'schema' => [
+                'auto_create' => true,
+                'properties' => [
+                    'relationship_type' => [
+                        'dataType' => ['string'],
+                        'description' => 'Type of social relationship',
+                    ],
+                    'strength' => [
+                        'dataType' => ['number'],
+                        'description' => 'Relationship strength score',
+                    ],
+                ],
+            ],
+        ],
+        */
+
+        // Custom adapter configuration example
+        /*
+        'custom_instance' => [
+            'adapter' => 'redis',  // Requires custom adapter to be registered
+            'redis_client' => 'redis.client.cache',
+            'ttl' => 3600,
+            'prefix' => 'edgebinder:',
+        ],
+        */
+    ],
+];
