@@ -6,7 +6,6 @@ namespace EdgeBinder\Component\Test;
 
 use EdgeBinder\Component\ConfigProvider;
 use EdgeBinder\Component\Factory\EdgeBinderFactory;
-use EdgeBinder\Component\Factory\WeaviateAdapterFactory;
 use EdgeBinder\EdgeBinder;
 use PHPUnit\Framework\TestCase;
 
@@ -30,7 +29,7 @@ final class ConfigProviderTest extends TestCase
 
         $this->assertIsArray($config);
         $this->assertArrayHasKey('dependencies', $config);
-        $this->assertArrayHasKey('edgebinder', $config);
+        $this->assertArrayNotHasKey('edgebinder', $config);
     }
 
     public function testGetDependenciesReturnsExpectedFactories(): void
@@ -50,14 +49,6 @@ final class ConfigProviderTest extends TestCase
         // Test named instance factory
         $this->assertArrayHasKey('edgebinder.default', $factories);
         $this->assertSame(EdgeBinderFactory::class, $factories['edgebinder.default']);
-
-        // Test adapter factory
-        $this->assertArrayHasKey(WeaviateAdapterFactory::class, $factories);
-        $this->assertIsCallable($factories[WeaviateAdapterFactory::class]);
-
-        // Test adapter service factory
-        $this->assertArrayHasKey('edgebinder.adapter.weaviate.default', $factories);
-        $this->assertSame(WeaviateAdapterFactory::class, $factories['edgebinder.adapter.weaviate.default']);
     }
 
     public function testGetDependenciesReturnsExpectedAliases(): void
@@ -72,52 +63,16 @@ final class ConfigProviderTest extends TestCase
         $this->assertSame('edgebinder.default', $aliases['edgebinder']);
     }
 
-    public function testGetEdgeBinderConfigReturnsDefaultConfiguration(): void
-    {
-        $config = $this->configProvider->getEdgeBinderConfig();
-
-        $this->assertIsArray($config);
-        $this->assertArrayHasKey('adapter', $config);
-        $this->assertSame('weaviate', $config['adapter']);
-
-        $this->assertArrayHasKey('weaviate_client', $config);
-        $this->assertSame('weaviate.client.default', $config['weaviate_client']);
-
-        $this->assertArrayHasKey('collection_name', $config);
-        $this->assertSame('EdgeBindings', $config['collection_name']);
-
-        $this->assertArrayHasKey('schema', $config);
-        $this->assertIsArray($config['schema']);
-        $this->assertArrayHasKey('auto_create', $config['schema']);
-        $this->assertTrue($config['schema']['auto_create']);
-    }
-
-    public function testWeaviateAdapterFactoryCallableReturnsCorrectInstance(): void
-    {
-        $dependencies = $this->configProvider->getDependencies();
-        $factories = $dependencies['factories'];
-
-        $factoryCallable = $factories[WeaviateAdapterFactory::class];
-        $this->assertIsCallable($factoryCallable);
-
-        $factory = $factoryCallable();
-        $this->assertInstanceOf(WeaviateAdapterFactory::class, $factory);
-    }
-
     public function testConfigurationStructureIsComplete(): void
     {
         $config = ($this->configProvider)();
 
         // Verify the complete structure matches expected format
-        $expectedKeys = ['dependencies', 'edgebinder'];
+        $expectedKeys = ['dependencies'];
         $this->assertSame($expectedKeys, array_keys($config));
 
         $dependencies = $config['dependencies'];
         $expectedDependencyKeys = ['factories', 'aliases'];
         $this->assertSame($expectedDependencyKeys, array_keys($dependencies));
-
-        $edgeBinderConfig = $config['edgebinder'];
-        $expectedConfigKeys = ['adapter', 'weaviate_client', 'collection_name', 'schema'];
-        $this->assertSame($expectedConfigKeys, array_keys($edgeBinderConfig));
     }
 }

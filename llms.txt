@@ -1,0 +1,135 @@
+# EdgeBinder Laminas Component - LLM Reference
+
+## Overview
+The EdgeBinder Laminas Component provides seamless integration between EdgeBinder (a lightweight relationship management library) and Laminas/Mezzio applications. It uses a self-determining adapter architecture where adapters register themselves automatically.
+
+## Quick Start
+
+### Installation
+```bash
+composer require edgebinder/laminas-component
+```
+
+### Basic Setup
+1. Register ConfigProvider in your application:
+```php
+// config/config.php
+use EdgeBinder\Component\ConfigProvider;
+$aggregator = new ConfigAggregator([ConfigProvider::class, /* other providers */]);
+```
+
+2. Copy and configure EdgeBinder:
+```bash
+cp vendor/edgebinder/laminas-component/config/edgebinder.global.php.dist config/autoload/edgebinder.local.php
+```
+
+3. Basic configuration:
+```php
+// config/autoload/edgebinder.local.php
+return [
+    'edgebinder' => [
+        'adapter' => 'inmemory', // For testing/development
+    ],
+];
+```
+
+### Service Usage
+```php
+class MyService
+{
+    public function __construct(private EdgeBinder $edgeBinder) {}
+    
+    public function createRelationship($from, $to): void
+    {
+        $this->edgeBinder->bind($from, $to, 'related_to', ['score' => 0.95]);
+    }
+}
+```
+
+## Adapters
+
+### Built-in Adapters
+- **InMemoryAdapter** (`inmemory`) - Included with EdgeBinder core v0.2.0+, perfect for testing
+
+### External Adapters (separate packages)
+- **WeaviateAdapter** (`weaviate`) - Install `edgebinder/weaviate-adapter` for vector databases
+- **RedisAdapter** (`redis`) - Install `edgebinder/redis-adapter` for caching
+- **JanusAdapter** (`janus`) - Install `edgebinder/janus-adapter` for graph databases
+
+### Self-Determining Architecture
+Adapters register themselves when their packages are loaded. No manual registration needed for packaged adapters.
+
+## Configuration Examples
+
+### Single Instance (Testing)
+```php
+'edgebinder' => ['adapter' => 'inmemory']
+```
+
+### Multiple Instances
+```php
+'edgebinder' => [
+    'test' => ['adapter' => 'inmemory'],
+    'rag' => [
+        'adapter' => 'weaviate',
+        'weaviate_client' => 'weaviate.client.rag',
+        'collection_name' => 'RAGBindings',
+    ],
+    'analytics' => [
+        'adapter' => 'janus',
+        'janus_client' => 'janus.client.analytics',
+        'graph_name' => 'AnalyticsGraph',
+    ],
+    'cache' => [
+        'adapter' => 'redis',
+        'redis_client' => 'redis.client.cache',
+        'ttl' => 3600,
+    ],
+]
+```
+
+## Service Names
+- `EdgeBinder::class` - Main EdgeBinder service
+- `'edgebinder'` - Alias for default instance
+- `'edgebinder.{name}'` - Named instances (e.g., 'edgebinder.rag')
+
+## Testing
+The component includes InMemoryAdapter for fast testing without external dependencies:
+
+```php
+// In tests
+$config = ['edgebinder' => ['adapter' => 'inmemory']];
+$edgeBinder = $container->get(EdgeBinder::class);
+// Use real EdgeBinder instance in tests
+```
+
+## Architecture
+- **ConfigProvider** - Registers EdgeBinder services with Laminas container
+- **EdgeBinderFactory** - Creates EdgeBinder instances with configured adapters
+- **Self-determining adapters** - Adapters register themselves via AdapterRegistry
+- **No defaults** - Applications must explicitly configure adapters
+- **Type safe** - Full PHP 8.3+ type safety with PHPStan level 8
+
+## Best Practices
+1. Start with `inmemory` adapter for development
+2. Use multiple instances for different concerns (rag, analytics, cache)
+3. Install external adapter packages as needed for production
+4. Copy configuration template and customize for your needs
+
+## Error Handling
+- Clear error messages for missing configuration
+- Helpful suggestions for unsupported adapters
+- Validation of required adapter configuration
+
+## Requirements
+- PHP 8.3+
+- Laminas ServiceManager 3.0+ or 4.0+
+- EdgeBinder ^0.2.0 (includes InMemoryAdapter)
+
+## Documentation
+- docs/INSTALLATION.md - Detailed installation guide
+- docs/CONFIGURATION.md - Comprehensive configuration reference  
+- docs/EXAMPLES.md - Real-world usage examples
+- config/edgebinder.global.php.dist - Configuration template
+
+This component provides a clean, tested foundation for EdgeBinder integration with Laminas/Mezzio applications following modern PHP best practices.

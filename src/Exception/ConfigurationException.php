@@ -54,6 +54,18 @@ final class ConfigurationException extends InvalidArgumentException
     }
 
     /**
+     * Create exception for missing adapter configuration.
+     *
+     * @return self
+     */
+    public static function missingAdapter(): self
+    {
+        return new self(
+            'Adapter type is required in configuration. Please specify the "adapter" key in your EdgeBinder configuration.'
+        );
+    }
+
+    /**
      * Create exception for unsupported adapter type.
      *
      * @param string $adapterType The unsupported adapter type
@@ -63,7 +75,7 @@ final class ConfigurationException extends InvalidArgumentException
     public static function unsupportedAdapter(string $adapterType): self
     {
         return new self(sprintf(
-            'Unsupported adapter type "%s". Please register the adapter factory or use a built-in adapter.',
+            'Unsupported adapter type "%s". Please register the adapter factory with AdapterRegistry.',
             $adapterType
         ));
     }

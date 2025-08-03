@@ -6,8 +6,7 @@ This guide covers the installation and setup of the EdgeBinder Laminas Component
 
 - PHP 8.3 or higher
 - Laminas ServiceManager 3.0+ or 4.0+
-- EdgeBinder ^0.1.0
-- EdgeBinder Weaviate Adapter ^0.1.0
+- EdgeBinder ^0.2.0 (includes InMemoryAdapter for testing)
 
 ## Installation
 
@@ -18,10 +17,14 @@ composer require edgebinder/laminas-component
 ```
 
 This will automatically install the required dependencies:
-- `edgebinder/edgebinder`
-- `edgebinder/weaviate-adapter`
+- `edgebinder/edgebinder` (includes InMemoryAdapter)
 - `laminas/laminas-servicemanager`
 - `psr/container`
+
+**Note**: Additional adapters are available as separate packages:
+- `edgebinder/weaviate-adapter` - For vector database support
+- `edgebinder/redis-adapter` - For caching and fast lookups
+- `edgebinder/janus-adapter` - For graph database support
 
 ### 2. Register the ConfigProvider
 
@@ -91,22 +94,26 @@ Edit the configuration file according to your needs:
 // config/autoload/edgebinder.local.php
 return [
     'edgebinder' => [
-        'adapter' => 'weaviate',
-        'weaviate_client' => 'weaviate.client.default',
-        'collection_name' => 'EdgeBindings',
-        'schema' => [
-            'auto_create' => true,
-            'vectorizer' => 'text2vec-openai',
-        ],
+        // For testing and development (no external dependencies)
+        'adapter' => 'inmemory',
+
+        // For production with Weaviate (requires edgebinder/weaviate-adapter)
+        // 'adapter' => 'weaviate',
+        // 'weaviate_client' => 'weaviate.client.default',
+        // 'collection_name' => 'EdgeBindings',
+        // 'schema' => [
+        //     'auto_create' => true,
+        //     'vectorizer' => 'text2vec-openai',
+        // ],
     ],
 ];
 ```
 
-### 4. Configure Weaviate Client (Required)
+### 4. Configure External Adapters (Optional)
 
-Since EdgeBinder uses Weaviate as the default adapter, you need to configure a Weaviate client. 
+If you're using external adapters like Weaviate, you'll need to configure them separately.
 
-If you're using the `zestic/weaviate-client-component`, add its ConfigProvider:
+For Weaviate adapter (requires `edgebinder/weaviate-adapter` and `zestic/weaviate-client-component`):
 
 ```php
 <?php
@@ -156,12 +163,8 @@ $config = (new ConfigProvider())();
 $serviceManager = new ServiceManager($config['dependencies']);
 $serviceManager->setService('config', [
     'edgebinder' => [
-        'adapter' => 'weaviate',
-        'weaviate_client' => 'weaviate.client.default',
-        'collection_name' => 'EdgeBindings',
-        'schema' => ['auto_create' => true],
+        'adapter' => 'inmemory', // Perfect for testing!
     ],
-    // Add your Weaviate client configuration here
 ]);
 
 try {
@@ -193,17 +196,22 @@ composer test
 
 ### Common Issues
 
-1. **"Required service not found"**
-   - Ensure all required services are registered in your container
-   - Check that the Weaviate client component is properly configured
+1. **"EdgeBinder configuration is missing"**
+   - Verify that the configuration file is in the correct location (`config/autoload/edgebinder.local.php`)
+   - Check that the ConfigProvider is registered in your application
 
-2. **"EdgeBinder configuration is missing"**
-   - Verify that the configuration file is in the correct location
-   - Check that the ConfigProvider is registered
+2. **"Adapter configuration is missing"**
+   - Ensure you have specified an `adapter` in your configuration
+   - For testing, use `'adapter' => 'inmemory'`
 
 3. **"Unsupported adapter type"**
-   - Ensure the adapter is properly registered
-   - For custom adapters, register them with the AdapterRegistry
+   - For external adapters, ensure the adapter package is installed
+   - Check that the adapter is properly registered with the AdapterRegistry
+   - For custom adapters, register them with `AdapterRegistry::register()`
+
+4. **"Required service not found"** (for external adapters)
+   - Ensure all required services are registered in your container
+   - For Weaviate: Check that the Weaviate client component is properly configured
 
 ### Getting Help
 

@@ -23,8 +23,7 @@ A Laminas/Mezzio integration component for [EdgeBinder](https://github.com/EdgeB
 
 - PHP 8.3+
 - Laminas ServiceManager 3.0+ or 4.0+
-- EdgeBinder ^0.1.0
-- EdgeBinder Weaviate Adapter ^0.1.0
+- EdgeBinder ^0.2.0 (includes InMemoryAdapter for testing)
 
 ## Installation
 
@@ -52,22 +51,46 @@ $aggregator = new ConfigAggregator([
 
 ### 2. Configure EdgeBinder
 
-Create configuration file:
+Copy the configuration template and customize it:
+
+```bash
+cp vendor/edgebinder/laminas-component/config/edgebinder.global.php.dist config/autoload/edgebinder.local.php
+```
+
+Or create configuration file manually:
 
 ```php
 // config/autoload/edgebinder.local.php
 return [
     'edgebinder' => [
-        'adapter' => 'weaviate',
-        'weaviate_client' => 'weaviate.client.default',
-        'collection_name' => 'EdgeBindings',
-        'schema' => [
-            'auto_create' => true,
-            'vectorizer' => 'text2vec-openai',
-        ],
+        // For testing and development
+        'adapter' => 'inmemory',
+
+        // For production with Weaviate (requires edgebinder/weaviate-adapter)
+        // 'adapter' => 'weaviate',
+        // 'weaviate_client' => 'weaviate.client.default',
+        // 'collection_name' => 'EdgeBindings',
+        // 'schema' => [
+        //     'auto_create' => true,
+        //     'vectorizer' => 'text2vec-openai',
+        // ],
     ],
 ];
 ```
+
+## Adapters
+
+EdgeBinder uses a self-determining adapter architecture. Adapters register themselves with the EdgeBinder AdapterRegistry when their packages are loaded.
+
+### Built-in Adapters
+
+- **InMemoryAdapter** (`inmemory`) - Included with EdgeBinder core v0.2.0+, perfect for testing and development
+
+### Available Adapters
+
+- **WeaviateAdapter** (`weaviate`) - Install `edgebinder/weaviate-adapter` for vector database support
+- **JanusAdapter** (`janus`) - Install `edgebinder/janus-adapter` for graph database support
+- **RedisAdapter** (`redis`) - Install `edgebinder/redis-adapter` for caching and fast lookups
 
 ### 3. Use in Your Services
 
@@ -111,6 +134,58 @@ Configure multiple EdgeBinder instances for different use cases:
 // config/autoload/edgebinder.local.php
 return [
     'edgebinder' => [
+        // RAG system with vector search
+        'rag' => [
+            'adapter' => 'weaviate',
+            'weaviate_client' => 'weaviate.client.rag',
+            'collection_name' => 'RAGBindings',
+            'schema' => ['vectorizer' => 'text2vec-openai'],
+        ],
+
+        // Analytics with graph database
+        'analytics' => [
+            'adapter' => 'janus',
+            'janus_client' => 'janus.client.analytics',
+            'graph_name' => 'AnalyticsGraph',
+        ],
+
+        // Fast cache lookups
+        'cache' => [
+            'adapter' => 'redis',
+            'redis_client' => 'redis.client.cache',
+            'ttl' => 3600,
+        ],
+
+        // Testing instance
+        'test' => [
+            'adapter' => 'inmemory',
+        ],
+    ],
+];
+```
+
+Register named instances in your container:
+
+```php
+// config/autoload/dependencies.local.php
+return [
+    'dependencies' => [
+        'factories' => [
+            'edgebinder.rag' => function(ContainerInterface $container) {
+                $factory = new EdgeBinderFactory();
+                return $factory->createEdgeBinder($container, 'rag');
+            },
+            'edgebinder.analytics' => function(ContainerInterface $container) {
+                $factory = new EdgeBinderFactory();
+                return $factory->createEdgeBinder($container, 'analytics');
+            },
+            'edgebinder.test' => function(ContainerInterface $container) {
+                $factory = new EdgeBinderFactory();
+                return $factory->createEdgeBinder($container, 'test');
+            },
+        ],
+    ],
+];
         'rag' => [
             'adapter' => 'weaviate',
             'weaviate_client' => 'weaviate.client.rag',

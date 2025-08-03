@@ -19,7 +19,10 @@ use Psr\Container\ContainerInterface;
  * - Multiple named instances
  * - Framework-agnostic adapter discovery via EdgeBinder registry
  * - Container-based adapter factories
- * - Built-in adapter support
+ *
+ * Adapters must be registered with the EdgeBinder AdapterRegistry or available
+ * as container services. No built-in adapters are provided - all adapters are
+ * self-determining through the registry system.
  */
 final class EdgeBinderFactory implements FactoryInterface
 {
@@ -125,7 +128,11 @@ final class EdgeBinderFactory implements FactoryInterface
         array $instanceConfig,
         array $globalConfig
     ): PersistenceAdapterInterface {
-        $adapterType = $instanceConfig['adapter'] ?? 'weaviate';
+        if (!isset($instanceConfig['adapter'])) {
+            throw ConfigurationException::missingAdapter();
+        }
+
+        $adapterType = $instanceConfig['adapter'];
 
         // Method 1: Check EdgeBinder registry (framework-agnostic)
         if (AdapterRegistry::hasAdapter($adapterType)) {
@@ -163,11 +170,8 @@ final class EdgeBinderFactory implements FactoryInterface
             }
         }
 
-        // Method 3: Built-in adapters
-        return match($adapterType) {
-            'weaviate' => $this->createWeaviateAdapter($container, $instanceConfig),
-            default => throw ConfigurationException::unsupportedAdapter($adapterType)
-        };
+        // No adapter found
+        throw ConfigurationException::unsupportedAdapter($adapterType);
     }
 
     /**
@@ -189,35 +193,5 @@ final class EdgeBinderFactory implements FactoryInterface
             'global' => $globalConfig,
             'container' => $container,
         ];
-    }
-
-    /**
-     * Create a Weaviate adapter instance.
-     *
-     * @param ContainerInterface $container
-     * @param array<string, mixed> $instanceConfig
-     *
-     * @return PersistenceAdapterInterface
-     *
-     * @throws ConfigurationException
-     */
-    private function createWeaviateAdapter(
-        ContainerInterface $container,
-        array $instanceConfig
-    ): PersistenceAdapterInterface {
-        if (!$container->has(WeaviateAdapterFactory::class)) {
-            throw ConfigurationException::missingService(WeaviateAdapterFactory::class);
-        }
-
-        $factory = $container->get(WeaviateAdapterFactory::class);
-
-        if (!$factory instanceof WeaviateAdapterFactory) {
-            throw ConfigurationException::invalidService(
-                WeaviateAdapterFactory::class,
-                'must be instance of WeaviateAdapterFactory'
-            );
-        }
-
-        return $factory->createAdapterFromConfig($container, $instanceConfig);
     }
 }

@@ -355,6 +355,12 @@ class SocialService
 // config/autoload/edgebinder.local.php
 return [
     'edgebinder' => [
+        // Testing instance
+        'test' => [
+            'adapter' => 'inmemory',
+        ],
+
+        // RAG system (requires edgebinder/weaviate-adapter)
         'rag' => [
             'adapter' => 'weaviate',
             'weaviate_client' => 'weaviate.client.rag',
@@ -370,32 +376,21 @@ return [
                 ],
             ],
         ],
+
+        // Analytics system (requires edgebinder/janus-adapter)
         'analytics' => [
-            'adapter' => 'weaviate',
-            'weaviate_client' => 'weaviate.client.analytics',
-            'collection_name' => 'AnalyticsBindings',
-            'schema' => [
-                'auto_create' => true,
-                'properties' => [
-                    'action_type' => ['dataType' => ['string']],
-                    'timestamp' => ['dataType' => ['date']],
-                    'session_id' => ['dataType' => ['string']],
-                    'ip_address' => ['dataType' => ['string']],
-                ],
-            ],
+            'adapter' => 'janus',
+            'janus_client' => 'janus.client.analytics',
+            'graph_name' => 'AnalyticsGraph',
+            'consistency_level' => 'eventual',
         ],
-        'social' => [
-            'adapter' => 'weaviate',
-            'weaviate_client' => 'weaviate.client.social',
-            'collection_name' => 'SocialBindings',
-            'schema' => [
-                'auto_create' => true,
-                'properties' => [
-                    'relationship_type' => ['dataType' => ['string']],
-                    'relationship_strength' => ['dataType' => ['number']],
-                    'created_at' => ['dataType' => ['date']],
-                ],
-            ],
+
+        // Cache system (requires edgebinder/redis-adapter)
+        'cache' => [
+            'adapter' => 'redis',
+            'redis_client' => 'redis.client.cache',
+            'ttl' => 3600,
+            'prefix' => 'edgebinder:',
         ],
     ],
 ];
@@ -458,4 +453,72 @@ class DocumentServiceTest extends TestCase
 }
 ```
 
-This completes the basic examples. The component provides a solid foundation for integrating EdgeBinder into Laminas/Mezzio applications with support for multiple instances, proper dependency injection, and comprehensive configuration options.
+### Integration Test with InMemoryAdapter
+
+```php
+<?php
+namespace App\Test\Integration;
+
+use App\Service\DocumentService;
+use EdgeBinder\Component\ConfigProvider;
+use EdgeBinder\EdgeBinder;
+use Laminas\ServiceManager\ServiceManager;
+use PHPUnit\Framework\TestCase;
+
+class DocumentServiceIntegrationTest extends TestCase
+{
+    private ServiceManager $container;
+    private DocumentService $documentService;
+
+    protected function setUp(): void
+    {
+        // Set up container with EdgeBinder component
+        $config = (new ConfigProvider())();
+        $this->container = new ServiceManager($config['dependencies']);
+
+        // Configure EdgeBinder with InMemoryAdapter
+        $this->container->setService('config', [
+            'edgebinder' => [
+                'adapter' => 'inmemory', // Perfect for testing!
+            ],
+        ]);
+
+        // Create service with real EdgeBinder instance
+        $edgeBinder = $this->container->get(EdgeBinder::class);
+        $this->documentService = new DocumentService($edgeBinder);
+    }
+
+    public function testRealBindingAndQuerying(): void
+    {
+        $document = new class('doc-1') {
+            public function __construct(private string $id) {}
+            public function getId(): string { return $this->id; }
+        };
+
+        $category = new class('cat-1') {
+            public function __construct(private string $id) {}
+            public function getId(): string { return $this->id; }
+        };
+
+        // Create binding
+        $this->documentService->linkDocumentToCategory($document, $category);
+
+        // Query bindings
+        $relatedDocuments = $this->documentService->findRelatedDocuments($document);
+
+        // Assertions
+        $this->assertCount(1, $relatedDocuments);
+        $this->assertEquals('belongs_to', $relatedDocuments[0]->getType());
+    }
+}
+```
+
+This completes the comprehensive examples. The component provides a solid foundation for integrating EdgeBinder into Laminas/Mezzio applications with:
+
+- **InMemoryAdapter** for fast testing and development
+- **Multiple instance support** for different use cases
+- **Self-determining adapter architecture** for easy extensibility
+- **Proper dependency injection** following Laminas best practices
+- **Comprehensive configuration options** for production deployments
+
+Start with InMemoryAdapter for development, then add external adapter packages as needed for production.

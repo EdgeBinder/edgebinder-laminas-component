@@ -15,6 +15,11 @@ declare(strict_types=1);
 return [
     'edgebinder' => [
         // Basic single instance configuration
+        // For testing and development (no external dependencies)
+        'adapter' => 'inmemory',
+
+        // For production with Weaviate (requires edgebinder/weaviate-adapter)
+        /*
         'adapter' => 'weaviate',
         'weaviate_client' => 'weaviate.client.default',
         'collection_name' => 'EdgeBindings',
@@ -22,9 +27,16 @@ return [
             'auto_create' => true,
             'vectorizer' => 'text2vec-openai',
         ],
+        */
 
         // Multiple instance configuration (uncomment and customize as needed)
         /*
+        // Testing instance
+        'test' => [
+            'adapter' => 'inmemory',
+        ],
+
+        // RAG system (requires edgebinder/weaviate-adapter)
         'rag' => [
             'adapter' => 'weaviate',
             'weaviate_client' => 'weaviate.client.rag',
@@ -32,67 +44,34 @@ return [
             'schema' => [
                 'auto_create' => true,
                 'vectorizer' => 'text2vec-openai',
-                'properties' => [
-                    'content' => [
-                        'dataType' => ['text'],
-                        'description' => 'Document content',
-                    ],
-                    'metadata' => [
-                        'dataType' => ['object'],
-                        'description' => 'Document metadata',
-                    ],
-                ],
             ],
         ],
+        // Analytics system (requires edgebinder/janus-adapter)
         'analytics' => [
-            'adapter' => 'weaviate',
-            'weaviate_client' => 'weaviate.client.analytics',
-            'collection_name' => 'AnalyticsBindings',
-            'schema' => [
-                'auto_create' => true,
-                'properties' => [
-                    'event_type' => [
-                        'dataType' => ['string'],
-                        'description' => 'Type of analytics event',
-                    ],
-                    'timestamp' => [
-                        'dataType' => ['date'],
-                        'description' => 'Event timestamp',
-                    ],
-                    'user_id' => [
-                        'dataType' => ['string'],
-                        'description' => 'User identifier',
-                    ],
-                ],
-            ],
+            'adapter' => 'janus',
+            'janus_client' => 'janus.client.analytics',
+            'graph_name' => 'AnalyticsGraph',
+            'consistency_level' => 'eventual',
         ],
-        'social' => [
-            'adapter' => 'weaviate',
-            'weaviate_client' => 'weaviate.client.social',
-            'collection_name' => 'SocialBindings',
-            'schema' => [
-                'auto_create' => true,
-                'properties' => [
-                    'relationship_type' => [
-                        'dataType' => ['string'],
-                        'description' => 'Type of social relationship',
-                    ],
-                    'strength' => [
-                        'dataType' => ['number'],
-                        'description' => 'Relationship strength score',
-                    ],
-                ],
-            ],
+
+        // Cache system (requires edgebinder/redis-adapter)
+        'cache' => [
+            'adapter' => 'redis',
+            'redis_client' => 'redis.client.cache',
+            'ttl' => 3600,
+            'prefix' => 'edgebinder:',
         ],
         */
 
         // Custom adapter configuration example
         /*
         'custom_instance' => [
-            'adapter' => 'redis',  // Requires custom adapter to be registered
-            'redis_client' => 'redis.client.cache',
-            'ttl' => 3600,
-            'prefix' => 'edgebinder:',
+            'adapter' => 'custom',  // Requires custom adapter to be registered with AdapterRegistry
+            'custom_client' => 'custom.client.service',
+            'custom_config' => [
+                'setting1' => 'value1',
+                'setting2' => 'value2',
+            ],
         ],
         */
     ],

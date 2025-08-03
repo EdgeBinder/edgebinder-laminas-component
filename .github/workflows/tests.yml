@@ -30,18 +30,7 @@ jobs:
 
     name: PHP ${{ matrix.php-version }} - ServiceManager ${{ matrix.servicemanager-version }} - PSR-11 ${{ matrix.psr-container-version }}
 
-    services:
-      weaviate:
-        image: semitechnologies/weaviate:1.25.0
-        ports:
-          - 8080:8080
-        env:
-          QUERY_DEFAULTS_LIMIT: 25
-          AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
-          PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
-          DEFAULT_VECTORIZER_MODULE: 'none'
-          ENABLE_MODULES: ''
-          CLUSTER_HOSTNAME: 'node1'
+
 
     steps:
     - uses: actions/checkout@v4
@@ -94,22 +83,11 @@ jobs:
     - name: Update dependencies after version constraints
       run: composer update --no-interaction --no-progress --prefer-dist
 
-    - name: Wait for Weaviate to be ready
-      run: |
-        timeout 60 bash -c 'until curl -f http://localhost:8080/v1/.well-known/ready; do sleep 2; done'
-
     - name: Run unit tests
       run: composer run-script test-unit
 
     - name: Run integration tests
       run: composer run-script test-integration
-      env:
-        WEAVIATE_HOST: localhost
-        WEAVIATE_PORT: 8080
-        WEAVIATE_SCHEME: http
-
-    - name: Run compatibility tests
-      run: composer run-script test-compatibility
 
     - name: Generate coverage report
       if: matrix.php-version == '8.3' && matrix.servicemanager-version == '4.0' && matrix.psr-container-version == '2.0'

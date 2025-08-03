@@ -13,13 +13,17 @@ The simplest configuration uses a single EdgeBinder instance:
 // config/autoload/edgebinder.local.php
 return [
     'edgebinder' => [
-        'adapter' => 'weaviate',
-        'weaviate_client' => 'weaviate.client.default',
-        'collection_name' => 'EdgeBindings',
-        'schema' => [
-            'auto_create' => true,
-            'vectorizer' => 'text2vec-openai',
-        ],
+        // For testing and development
+        'adapter' => 'inmemory',
+
+        // For production with Weaviate (requires edgebinder/weaviate-adapter)
+        // 'adapter' => 'weaviate',
+        // 'weaviate_client' => 'weaviate.client.default',
+        // 'collection_name' => 'EdgeBindings',
+        // 'schema' => [
+        //     'auto_create' => true,
+        //     'vectorizer' => 'text2vec-openai',
+        // ],
     ],
 ];
 ```
@@ -28,7 +32,18 @@ return [
 
 | Key | Type | Required | Default | Description |
 |-----|------|----------|---------|-------------|
-| `adapter` | string | Yes | `'weaviate'` | Adapter type to use |
+| `adapter` | string | Yes | None | Adapter type to use (`inmemory`, `weaviate`, `redis`, `janus`, etc.) |
+
+**Adapter-Specific Configuration:**
+
+**InMemoryAdapter** (no additional configuration needed):
+```php
+'adapter' => 'inmemory'
+```
+
+**WeaviateAdapter** (requires `edgebinder/weaviate-adapter`):
+| Key | Type | Required | Default | Description |
+|-----|------|----------|---------|-------------|
 | `weaviate_client` | string | Yes | `'weaviate.client.default'` | Weaviate client service name |
 | `collection_name` | string | No | `'EdgeBindings'` | Weaviate collection name |
 | `schema` | array | No | `['auto_create' => true]` | Collection schema configuration |
@@ -42,6 +57,12 @@ Configure multiple EdgeBinder instances for different use cases:
 // config/autoload/edgebinder.local.php
 return [
     'edgebinder' => [
+        // Testing instance
+        'test' => [
+            'adapter' => 'inmemory',
+        ],
+
+        // RAG system (requires edgebinder/weaviate-adapter)
         'rag' => [
             'adapter' => 'weaviate',
             'weaviate_client' => 'weaviate.client.rag',
@@ -49,53 +70,22 @@ return [
             'schema' => [
                 'auto_create' => true,
                 'vectorizer' => 'text2vec-openai',
-                'properties' => [
-                    'content' => [
-                        'dataType' => ['text'],
-                        'description' => 'Document content',
-                    ],
-                    'metadata' => [
-                        'dataType' => ['object'],
-                        'description' => 'Document metadata',
-                    ],
-                ],
             ],
         ],
+        // Analytics system (requires edgebinder/janus-adapter)
         'analytics' => [
-            'adapter' => 'weaviate',
-            'weaviate_client' => 'weaviate.client.analytics',
-            'collection_name' => 'AnalyticsBindings',
-            'schema' => [
-                'auto_create' => true,
-                'properties' => [
-                    'event_type' => [
-                        'dataType' => ['string'],
-                        'description' => 'Type of analytics event',
-                    ],
-                    'timestamp' => [
-                        'dataType' => ['date'],
-                        'description' => 'Event timestamp',
-                    ],
-                ],
-            ],
+            'adapter' => 'janus',
+            'janus_client' => 'janus.client.analytics',
+            'graph_name' => 'AnalyticsGraph',
+            'consistency_level' => 'eventual',
         ],
-        'social' => [
-            'adapter' => 'weaviate',
-            'weaviate_client' => 'weaviate.client.social',
-            'collection_name' => 'SocialBindings',
-            'schema' => [
-                'auto_create' => true,
-                'properties' => [
-                    'relationship_type' => [
-                        'dataType' => ['string'],
-                        'description' => 'Type of social relationship',
-                    ],
-                    'strength' => [
-                        'dataType' => ['number'],
-                        'description' => 'Relationship strength score',
-                    ],
-                ],
-            ],
+
+        // Cache system (requires edgebinder/redis-adapter)
+        'cache' => [
+            'adapter' => 'redis',
+            'redis_client' => 'redis.client.cache',
+            'ttl' => 3600,
+            'prefix' => 'edgebinder:',
         ],
     ],
 ];
@@ -160,16 +150,16 @@ return [
 | `'EdgeBinder'` | Alias for main EdgeBinder service |
 | `'edgebinder'` | Alias for default instance |
 | `'edgebinder.default'` | Default EdgeBinder instance |
-| `'edgebinder.rag'` | RAG-specific EdgeBinder instance |
-| `'edgebinder.analytics'` | Analytics EdgeBinder instance |
-| `'edgebinder.social'` | Social EdgeBinder instance |
 
-### Adapter Services
-
+**Named Instance Services** (when configured):
 | Service Name | Description |
 |--------------|-------------|
-| `WeaviateAdapterFactory::class` | Weaviate adapter factory |
-| `'edgebinder.adapter.weaviate.default'` | Default Weaviate adapter |
+| `'edgebinder.test'` | Testing EdgeBinder instance |
+| `'edgebinder.rag'` | RAG-specific EdgeBinder instance |
+| `'edgebinder.analytics'` | Analytics EdgeBinder instance |
+| `'edgebinder.cache'` | Cache EdgeBinder instance |
+
+**Note**: Adapter services are managed by their respective packages and register themselves with the EdgeBinder AdapterRegistry.
 
 ## Environment-Specific Configuration
 
@@ -180,13 +170,17 @@ return [
 // config/autoload/edgebinder.development.local.php
 return [
     'edgebinder' => [
-        'adapter' => 'weaviate',
-        'weaviate_client' => 'weaviate.client.development',
-        'collection_name' => 'EdgeBindings_Dev',
-        'schema' => [
-            'auto_create' => true,
-            'vectorizer' => 'text2vec-openai',
-        ],
+        // Use InMemoryAdapter for fast development
+        'adapter' => 'inmemory',
+
+        // Or use external adapter for integration testing
+        // 'adapter' => 'weaviate',
+        // 'weaviate_client' => 'weaviate.client.development',
+        // 'collection_name' => 'EdgeBindings_Dev',
+        // 'schema' => [
+        //     'auto_create' => true,
+        //     'vectorizer' => 'text2vec-openai',
+        // ],
     ],
 ];
 ```
@@ -198,7 +192,7 @@ return [
 // config/autoload/edgebinder.production.local.php
 return [
     'edgebinder' => [
-        'adapter' => 'weaviate',
+        'adapter' => 'weaviate', // or 'redis', 'janus', etc.
         'weaviate_client' => 'weaviate.client.production',
         'collection_name' => 'EdgeBindings',
         'schema' => [
@@ -211,24 +205,36 @@ return [
 
 ## Custom Adapter Configuration
 
-### Redis Adapter Example
+### Custom Adapter Example
 
+EdgeBinder uses a self-determining adapter architecture. Adapters register themselves when their packages are loaded.
+
+**Option 1: Install existing adapter packages**
+```bash
+composer require edgebinder/redis-adapter
+composer require edgebinder/janus-adapter
+```
+
+**Option 2: Create custom adapter**
 ```php
 <?php
-// First, register the custom adapter in your bootstrap
+// In your bootstrap or ConfigProvider
 use EdgeBinder\Registry\AdapterRegistry;
-use MyVendor\RedisAdapter\RedisAdapterFactory;
+use MyVendor\CustomAdapter\CustomAdapterFactory;
 
-AdapterRegistry::register(new RedisAdapterFactory());
+// Register the custom adapter
+AdapterRegistry::register(new CustomAdapterFactory());
 
 // Then configure it
 return [
     'edgebinder' => [
-        'cache' => [
-            'adapter' => 'redis',
-            'redis_client' => 'redis.client.cache',
-            'ttl' => 3600,
-            'prefix' => 'edgebinder:',
+        'custom_instance' => [
+            'adapter' => 'custom',
+            'custom_client' => 'custom.client.service',
+            'custom_config' => [
+                'setting1' => 'value1',
+                'setting2' => 'value2',
+            ],
         ],
     ],
 ];
@@ -250,6 +256,12 @@ EdgeBinder configuration is missing: config service not found in container
 EdgeBinder configuration is invalid: config service must return an array
 ```
 
+### Missing Adapter Configuration
+
+```
+Adapter configuration is missing. Please specify an 'adapter' in your EdgeBinder configuration.
+```
+
 ### Instance Not Configured
 
 ```
@@ -259,7 +271,7 @@ EdgeBinder instance "rag" is not configured. Please add configuration for this i
 ### Unsupported Adapter
 
 ```
-Unsupported adapter type "redis". Please register the adapter factory or use a built-in adapter.
+Unsupported adapter type "custom". Please install the adapter package or register the adapter factory.
 ```
 
 ## Best Practices
@@ -271,31 +283,42 @@ Unsupported adapter type "redis". Please register the adapter factory or use a b
 - `edgebinder.development.local.php` - Development settings
 - `edgebinder.production.local.php` - Production settings
 
-### 2. Separate Concerns with Multiple Instances
+### 2. Start with InMemoryAdapter for Development
 
 ```php
 'edgebinder' => [
-    'rag' => [/* RAG-specific config */],
-    'analytics' => [/* Analytics-specific config */],
-    'social' => [/* Social-specific config */],
+    'adapter' => 'inmemory', // Fast, no external dependencies
 ]
 ```
 
-### 3. Use Descriptive Collection Names
+### 3. Separate Concerns with Multiple Instances
 
 ```php
-'collection_name' => 'RAGBindings_v1_Production'
+'edgebinder' => [
+    'test' => ['adapter' => 'inmemory'],
+    'rag' => ['adapter' => 'weaviate', /* RAG-specific config */],
+    'analytics' => ['adapter' => 'janus', /* Analytics-specific config */],
+    'cache' => ['adapter' => 'redis', /* Cache-specific config */],
+]
 ```
 
-### 4. Pre-create Schemas in Production
+### 4. Use Descriptive Collection/Database Names
+
+```php
+'collection_name' => 'RAGBindings_v1_Production'  // For Weaviate
+'graph_name' => 'AnalyticsGraph_Production'       // For Janus
+'prefix' => 'edgebinder:prod:'                    // For Redis
+```
+
+### 5. Pre-create Schemas in Production (for applicable adapters)
 
 ```php
 'schema' => [
-    'auto_create' => false, // Set to false in production
+    'auto_create' => false, // Set to false in production for Weaviate
 ]
 ```
 
-### 5. Configure Appropriate Vectorizers
+### 6. Configure Appropriate Vectorizers (for Weaviate)
 
 ```php
 'schema' => [
@@ -311,18 +334,30 @@ Unsupported adapter type "redis". Please register the adapter factory or use a b
 
 ### Common Configuration Issues
 
-1. **Service not found**: Ensure all referenced services are registered
-2. **Invalid schema**: Validate Weaviate schema syntax
-3. **Connection issues**: Check Weaviate client configuration
-4. **Permission errors**: Verify Weaviate API permissions
+1. **Missing adapter configuration**: Ensure you specify an `adapter` in your configuration
+2. **Adapter package not installed**: Install the required adapter package (e.g., `edgebinder/weaviate-adapter`)
+3. **Service not found**: Ensure all referenced services are registered (for external adapters)
+4. **Invalid schema**: Validate adapter-specific schema syntax (e.g., Weaviate schema)
+5. **Connection issues**: Check external service configuration (e.g., Weaviate client, Redis client)
+6. **Permission errors**: Verify external service API permissions
 
-### Debug Configuration
+### Quick Debug Steps
 
-Enable debug mode to see detailed configuration information:
+1. **Start with InMemoryAdapter** to verify basic functionality:
+   ```php
+   'adapter' => 'inmemory'
+   ```
 
-```php
-'edgebinder' => [
-    'debug' => true, // Enable debug mode
-    // ... other configuration
-]
-```
+2. **Check adapter registration**:
+   ```php
+   // In your bootstrap
+   $registeredTypes = \EdgeBinder\Registry\AdapterRegistry::getRegisteredTypes();
+   var_dump($registeredTypes); // Should include your adapter type
+   ```
+
+3. **Verify service registration** (for external adapters):
+   ```php
+   // Check if required services exist
+   $container->has('weaviate.client.default'); // For Weaviate
+   $container->has('redis.client.cache');      // For Redis
+   ```

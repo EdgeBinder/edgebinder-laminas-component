@@ -12,10 +12,6 @@ parameters:
         - '#Dynamic call to static method PHPUnit\\Framework\\Assert::#'
         # Allow always true assertions in tests (they're for documentation)
         - '#Call to method PHPUnit\\Framework\\Assert::.* will always evaluate to true#'
-        # Allow PHPUnit mock method calls
-        - '#Call to an undefined method Psr\\Container\\ContainerInterface::method\(\)#'
-        # Allow PHPUnit mock return types
-        - '#Return type of call to method PHPUnit\\Framework\\TestCase::createMock\(\) contains unresolvable type#'
         # Allow more specific array types in factory implementations
         - '#Parameter \#3 \$options \(array<string, mixed>\|null\) of method .+Factory::__invoke\(\) should be contravariant with parameter \$options \(array\|null\)#'
 

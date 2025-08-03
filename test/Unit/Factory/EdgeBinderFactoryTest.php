@@ -6,8 +6,9 @@ namespace EdgeBinder\Component\Test\Factory;
 
 use EdgeBinder\Component\Exception\ConfigurationException;
 use EdgeBinder\Component\Factory\EdgeBinderFactory;
-use EdgeBinder\Component\Factory\WeaviateAdapterFactory;
 use EdgeBinder\EdgeBinder;
+use EdgeBinder\Persistence\InMemory\InMemoryAdapterFactory;
+use EdgeBinder\Registry\AdapterRegistry;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -20,40 +21,43 @@ final class EdgeBinderFactoryTest extends TestCase
 {
     private EdgeBinderFactory $factory;
 
-    private ContainerInterface $container;
-
     protected function setUp(): void
     {
         $this->factory = new EdgeBinderFactory();
-        $this->container = $this->createMock(ContainerInterface::class);
+
+        // Clear registry and register InMemoryAdapter for tests
+        AdapterRegistry::clear();
+        AdapterRegistry::register(new InMemoryAdapterFactory());
+    }
+
+    protected function tearDown(): void
+    {
+        // Clean up registry after each test
+        AdapterRegistry::clear();
     }
 
     public function testInvokeCreatesEdgeBinderWithDefaultConfiguration(): void
     {
         $config = [
             'edgebinder' => [
-                'adapter' => 'weaviate',
-                'weaviate_client' => 'weaviate.client.default',
-                'collection_name' => 'EdgeBindings',
-                'schema' => ['auto_create' => true],
+                'adapter' => 'inmemory',
             ],
         ];
 
-        $this->container
+        $container = $this->createMock(ContainerInterface::class);
+        $container
             ->method('has')
             ->willReturnMap([
                 ['config', true],
-                [WeaviateAdapterFactory::class, true],
             ]);
 
-        $this->container
+        $container
             ->method('get')
             ->willReturnMap([
                 ['config', $config],
-                [WeaviateAdapterFactory::class, $this->createMockWeaviateAdapterFactory()],
             ]);
 
-        $result = ($this->factory)($this->container, EdgeBinder::class);
+        $result = ($this->factory)($container, EdgeBinder::class);
 
         $this->assertInstanceOf(EdgeBinder::class, $result);
     }
@@ -63,29 +67,25 @@ final class EdgeBinderFactoryTest extends TestCase
         $config = [
             'edgebinder' => [
                 'rag' => [
-                    'adapter' => 'weaviate',
-                    'weaviate_client' => 'weaviate.client.rag',
-                    'collection_name' => 'RAGBindings',
-                    'schema' => ['auto_create' => true],
+                    'adapter' => 'inmemory',
                 ],
             ],
         ];
 
-        $this->container
+        $container = $this->createMock(ContainerInterface::class);
+        $container
             ->method('has')
             ->willReturnMap([
                 ['config', true],
-                [WeaviateAdapterFactory::class, true],
             ]);
 
-        $this->container
+        $container
             ->method('get')
             ->willReturnMap([
                 ['config', $config],
-                [WeaviateAdapterFactory::class, $this->createMockWeaviateAdapterFactory()],
             ]);
 
-        $result = $this->factory->createEdgeBinder($this->container, 'rag');
+        $result = $this->factory->createEdgeBinder($container, 'rag');
 
         $this->assertInstanceOf(EdgeBinder::class, $result);
     }
@@ -94,35 +94,32 @@ final class EdgeBinderFactoryTest extends TestCase
     {
         $config = [
             'edgebinder' => [
-                'adapter' => 'weaviate',
-                'weaviate_client' => 'weaviate.client.default',
-                'collection_name' => 'EdgeBindings',
-                'schema' => ['auto_create' => true],
+                'adapter' => 'inmemory',
             ],
         ];
 
-        $this->container
+        $container = $this->createMock(ContainerInterface::class);
+        $container
             ->method('has')
             ->willReturnMap([
                 ['config', true],
-                [WeaviateAdapterFactory::class, true],
             ]);
 
-        $this->container
+        $container
             ->method('get')
             ->willReturnMap([
                 ['config', $config],
-                [WeaviateAdapterFactory::class, $this->createMockWeaviateAdapterFactory()],
             ]);
 
-        $result = $this->factory->createEdgeBinder($this->container, 'default');
+        $result = $this->factory->createEdgeBinder($container, 'default');
 
         $this->assertInstanceOf(EdgeBinder::class, $result);
     }
 
     public function testThrowsExceptionWhenConfigServiceNotFound(): void
     {
-        $this->container
+        $container = $this->createMock(ContainerInterface::class);
+        $container
             ->method('has')
             ->with('config')
             ->willReturn(false);
@@ -130,17 +127,18 @@ final class EdgeBinderFactoryTest extends TestCase
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage('EdgeBinder configuration is missing: config service not found in container');
 
-        ($this->factory)($this->container, EdgeBinder::class);
+        ($this->factory)($container, EdgeBinder::class);
     }
 
     public function testThrowsExceptionWhenConfigServiceReturnsNonArray(): void
     {
-        $this->container
+        $container = $this->createMock(ContainerInterface::class);
+        $container
             ->method('has')
             ->with('config')
             ->willReturn(true);
 
-        $this->container
+        $container
             ->method('get')
             ->with('config')
             ->willReturn('invalid-config');
@@ -148,7 +146,7 @@ final class EdgeBinderFactoryTest extends TestCase
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage('EdgeBinder configuration is invalid: config service must return an array');
 
-        ($this->factory)($this->container, EdgeBinder::class);
+        ($this->factory)($container, EdgeBinder::class);
     }
 
     public function testThrowsExceptionWhenInstanceNotConfigured(): void
@@ -156,17 +154,18 @@ final class EdgeBinderFactoryTest extends TestCase
         $config = [
             'edgebinder' => [
                 'default' => [
-                    'adapter' => 'weaviate',
+                    'adapter' => 'inmemory',
                 ],
             ],
         ];
 
-        $this->container
+        $container = $this->createMock(ContainerInterface::class);
+        $container
             ->method('has')
             ->with('config')
             ->willReturn(true);
 
-        $this->container
+        $container
             ->method('get')
             ->with('config')
             ->willReturn($config);
@@ -174,25 +173,29 @@ final class EdgeBinderFactoryTest extends TestCase
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage('EdgeBinder instance "nonexistent" is not configured');
 
-        $this->factory->createEdgeBinder($this->container, 'nonexistent');
+        $this->factory->createEdgeBinder($container, 'nonexistent');
     }
 
     public function testThrowsExceptionForUnsupportedAdapter(): void
     {
+        // Clear registry to ensure unsupported adapter isn't available
+        AdapterRegistry::clear();
+
         $config = [
             'edgebinder' => [
                 'adapter' => 'unsupported',
             ],
         ];
 
-        $this->container
+        $container = $this->createMock(ContainerInterface::class);
+        $container
             ->method('has')
             ->willReturnMap([
                 ['config', true],
                 ['edgebinder.adapter.unsupported', false],
             ]);
 
-        $this->container
+        $container
             ->method('get')
             ->with('config')
             ->willReturn($config);
@@ -200,45 +203,33 @@ final class EdgeBinderFactoryTest extends TestCase
         $this->expectException(ConfigurationException::class);
         $this->expectExceptionMessage('Unsupported adapter type "unsupported"');
 
-        ($this->factory)($this->container, EdgeBinder::class);
+        ($this->factory)($container, EdgeBinder::class);
     }
 
-    public function testThrowsExceptionWhenWeaviateAdapterFactoryNotFound(): void
+    public function testThrowsExceptionWhenAdapterConfigurationMissing(): void
     {
         $config = [
             'edgebinder' => [
-                'adapter' => 'weaviate',
+                'default' => [
+                    // Missing 'adapter' key
+                ],
             ],
         ];
 
-        $this->container
+        $container = $this->createMock(ContainerInterface::class);
+        $container
             ->method('has')
-            ->willReturnMap([
-                ['config', true],
-                ['edgebinder.adapter.weaviate', false],
-                [WeaviateAdapterFactory::class, false],
-            ]);
+            ->with('config')
+            ->willReturn(true);
 
-        $this->container
+        $container
             ->method('get')
             ->with('config')
             ->willReturn($config);
 
         $this->expectException(ConfigurationException::class);
-        $this->expectExceptionMessage('Required service "EdgeBinder\Component\Factory\WeaviateAdapterFactory" is not registered');
+        $this->expectExceptionMessage('Adapter type is required in configuration');
 
-        ($this->factory)($this->container, EdgeBinder::class);
-    }
-
-    private function createMockWeaviateAdapterFactory(): WeaviateAdapterFactory
-    {
-        $factory = $this->createMock(WeaviateAdapterFactory::class);
-        $adapter = $this->createMock(\EdgeBinder\Contracts\PersistenceAdapterInterface::class);
-
-        $factory
-            ->method('createAdapterFromConfig')
-            ->willReturn($adapter);
-
-        return $factory;
+        $this->factory->createEdgeBinder($container, 'default');
     }
 }

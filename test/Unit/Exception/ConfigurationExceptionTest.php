@@ -56,13 +56,23 @@ final class ConfigurationExceptionTest extends TestCase
         );
     }
 
+    public function testMissingAdapter(): void
+    {
+        $exception = ConfigurationException::missingAdapter();
+
+        $this->assertSame(
+            'Adapter type is required in configuration. Please specify the "adapter" key in your EdgeBinder configuration.',
+            $exception->getMessage()
+        );
+    }
+
     public function testUnsupportedAdapter(): void
     {
         $adapterType = 'unsupported';
         $exception = ConfigurationException::unsupportedAdapter($adapterType);
 
         $this->assertSame(
-            'Unsupported adapter type "unsupported". Please register the adapter factory or use a built-in adapter.',
+            'Unsupported adapter type "unsupported". Please register the adapter factory with AdapterRegistry.',
             $exception->getMessage()
         );
     }

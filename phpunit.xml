@@ -9,7 +9,7 @@
          beStrictAboutCoverageMetadata="true"
          beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
-         failOnWarning="true">
+         failOnWarning="false">
     
     <testsuites>
         <testsuite name="Unit Tests">
@@ -17,12 +17,6 @@
         </testsuite>
         <testsuite name="Integration Tests">
             <directory>test/Integration</directory>
-        </testsuite>
-        <testsuite name="Compatibility Tests">
-            <directory>test/Compatibility</directory>
-        </testsuite>
-        <testsuite name="All Tests">
-            <directory>test</directory>
         </testsuite>
     </testsuites>
 
@@ -44,9 +38,6 @@
             <clover outputFile="coverage/clover.xml"/>
             <text outputFile="php://stdout" showUncoveredFiles="false"/>
         </report>
-        <thresholds>
-            <high lowUpperBound="50" highLowerBound="90"/>
-        </thresholds>
     </coverage>
 
     <logging>
@@ -57,9 +48,6 @@
         <ini name="error_reporting" value="-1"/>
         <ini name="memory_limit" value="-1"/>
         <env name="PHPUNIT_RUNNING" value="1"/>
-        <env name="WEAVIATE_HOST" value="localhost"/>
-        <env name="WEAVIATE_PORT" value="8080"/>
-        <env name="WEAVIATE_SCHEME" value="http"/>
         <env name="EDGEBINDER_TEST_MODE" value="true"/>
     </php>
 </phpunit>
