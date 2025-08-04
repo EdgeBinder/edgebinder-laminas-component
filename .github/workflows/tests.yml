@@ -13,16 +13,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.3', '8.4']
-        servicemanager-version: ['3.0', '4.0']
-        psr-container-version: ['1.0', '2.0']
         include:
-          # Test with lowest dependencies
+          # ServiceManager 3.x only supports PSR-11 v1.0
           - php-version: '8.3'
             servicemanager-version: '3.0'
             psr-container-version: '1.0'
             dependencies: 'lowest'
-          # Test with highest dependencies
+          - php-version: '8.3'
+            servicemanager-version: '3.0'
+            psr-container-version: '1.0'
+            dependencies: 'normal'
+          - php-version: '8.4'
+            servicemanager-version: '3.0'
+            psr-container-version: '1.0'
+            dependencies: 'normal'
+
+          # ServiceManager 4.x supports PSR-11 v2.0
+          - php-version: '8.3'
+            servicemanager-version: '4.0'
+            psr-container-version: '2.0'
+            dependencies: 'normal'
           - php-version: '8.4'
             servicemanager-version: '4.0'
             psr-container-version: '2.0'
@@ -54,17 +64,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php-${{ matrix.php-version }}-
 
-    - name: Install dependencies
-      run: |
-        if [[ "${{ matrix.dependencies }}" == "lowest" ]]; then
-          composer update --prefer-lowest --no-interaction --no-progress --prefer-dist
-        elif [[ "${{ matrix.dependencies }}" == "highest" ]]; then
-          composer update --no-interaction --no-progress --prefer-dist
-        else
-          composer install --no-interaction --no-progress --prefer-dist
-        fi
-
-    - name: Install specific ServiceManager version
+    - name: Set version constraints
       run: |
         if [[ "${{ matrix.servicemanager-version }}" == "3.0" ]]; then
           composer require "laminas/laminas-servicemanager:^3.0" --no-update
@@ -72,16 +72,21 @@ jobs:
           composer require "laminas/laminas-servicemanager:^4.0" --no-update
         fi
 
-    - name: Install specific PSR Container version
-      run: |
         if [[ "${{ matrix.psr-container-version }}" == "1.0" ]]; then
           composer require "psr/container:^1.0" --no-update
         else
           composer require "psr/container:^2.0" --no-update
         fi
 
-    - name: Update dependencies after version constraints
-      run: composer update --no-interaction --no-progress --prefer-dist
+    - name: Install dependencies
+      run: |
+        if [[ "${{ matrix.dependencies }}" == "lowest" ]]; then
+          composer update --prefer-lowest --no-interaction --no-progress --prefer-dist
+        elif [[ "${{ matrix.dependencies }}" == "highest" ]]; then
+          composer update --no-interaction --no-progress --prefer-dist
+        else
+          composer update --no-interaction --no-progress --prefer-dist
+        fi
 
     - name: Run unit tests
       run: composer run-script test-unit
