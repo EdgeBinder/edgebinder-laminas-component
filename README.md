@@ -3,10 +3,10 @@
 [![Tests](https://github.com/EdgeBinder/edgebinder-component/workflows/Tests/badge.svg)](https://github.com/EdgeBinder/edgebinder-component/actions?query=workflow%3ATests)
 [![Lint](https://github.com/EdgeBinder/edgebinder-component/workflows/Lint/badge.svg)](https://github.com/EdgeBinder/edgebinder-component/actions?query=workflow%3ALint)
 [![Coverage Status](https://codecov.io/gh/EdgeBinder/edgebinder-component/branch/main/graph/badge.svg)](https://codecov.io/gh/EdgeBinder/edgebinder-component)
-[![Latest Stable Version](https://poser.pugx.org/edgebinder/laminas-component/v/stable)](https://packagist.org/packages/edgebinder/laminas-component)
-[![Total Downloads](https://poser.pugx.org/edgebinder/laminas-component/downloads)](https://packagist.org/packages/edgebinder/laminas-component)
-[![License](https://poser.pugx.org/edgebinder/laminas-component/license)](https://packagist.org/packages/edgebinder/laminas-component)
-[![PHP Version Require](https://poser.pugx.org/edgebinder/laminas-component/require/php)](https://packagist.org/packages/edgebinder/laminas-component)
+[![Latest Stable Version](https://poser.pugx.org/edgebinder/edgebinder-component/v/stable)](https://packagist.org/packages/edgebinder/edgebinder-component)
+[![Total Downloads](https://poser.pugx.org/edgebinder/edgebinder-component/downloads)](https://packagist.org/packages/edgebinder/edgebinder-component)
+[![License](https://poser.pugx.org/edgebinder/edgebinder-component/license)](https://packagist.org/packages/edgebinder/edgebinder-component)
+[![PHP Version Require](https://poser.pugx.org/edgebinder/edgebinder-component/require/php)](https://packagist.org/packages/edgebinder/edgebinder-component)
 
 A Laminas/Mezzio integration component for [EdgeBinder](https://github.com/EdgeBinder/edgebinder) - A lightweight, storage-agnostic relationship management library for PHP 8.3+.
 
