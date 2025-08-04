@@ -67,7 +67,6 @@
         "phpstan": "phpstan analyse src test --level=8",
         "security-audit": "composer audit",
         "test": "phpunit --no-coverage",
-
         "test-coverage": "XDEBUG_MODE=coverage phpunit --coverage-clover=coverage.xml --coverage-html=coverage-html",
         "test-integration": "phpunit --no-coverage test/Integration",
         "test-unit": "phpunit --no-coverage test/Unit"
