@@ -5,6 +5,8 @@ composer.lock
 # PHPUnit
 /.phpunit.cache/
 /coverage/
+/coverage-html/
+coverage.xml
 /phpunit.xml.local
 
 # PHP CS Fixer
