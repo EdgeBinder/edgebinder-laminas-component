@@ -1,12 +1,12 @@
 # EdgeBinder Laminas Component
 
-[![Tests](https://github.com/EdgeBinder/edgebinder-component/workflows/Tests/badge.svg)](https://github.com/EdgeBinder/edgebinder-component/actions?query=workflow%3ATests)
-[![Lint](https://github.com/EdgeBinder/edgebinder-component/workflows/Lint/badge.svg)](https://github.com/EdgeBinder/edgebinder-component/actions?query=workflow%3ALint)
-[![Coverage Status](https://codecov.io/gh/EdgeBinder/edgebinder-component/branch/main/graph/badge.svg)](https://codecov.io/gh/EdgeBinder/edgebinder-component)
-[![Latest Stable Version](https://poser.pugx.org/edgebinder/edgebinder-component/v/stable)](https://packagist.org/packages/edgebinder/edgebinder-component)
-[![Total Downloads](https://poser.pugx.org/edgebinder/edgebinder-component/downloads)](https://packagist.org/packages/edgebinder/edgebinder-component)
-[![License](https://poser.pugx.org/edgebinder/edgebinder-component/license)](https://packagist.org/packages/edgebinder/edgebinder-component)
-[![PHP Version Require](https://poser.pugx.org/edgebinder/edgebinder-component/require/php)](https://packagist.org/packages/edgebinder/edgebinder-component)
+[![Tests](https://github.com/EdgeBinder/edgebinder-laminas-component/workflows/Tests/badge.svg)](https://github.com/EdgeBinder/edgebinder-laminas-component/actions?query=workflow%3ATests)
+[![Lint](https://github.com/EdgeBinder/edgebinder-laminas-component/workflows/Lint/badge.svg)](https://github.com/EdgeBinder/edgebinder-laminas-component/actions?query=workflow%3ALint)
+[![Coverage Status](https://codecov.io/gh/EdgeBinder/edgebinder-laminas-component/branch/main/graph/badge.svg)](https://codecov.io/gh/EdgeBinder/edgebinder-laminas-component)
+[![Latest Stable Version](https://poser.pugx.org/edgebinder/edgebinder-laminas-component/v/stable)](https://packagist.org/packages/edgebinder/edgebinder-laminas-component)
+[![Total Downloads](https://poser.pugx.org/edgebinder/edgebinder-laminas-component/downloads)](https://packagist.org/packages/edgebinder/edgebinder-laminas-component)
+[![License](https://poser.pugx.org/edgebinder/edgebinder-laminas-component/license)](https://packagist.org/packages/edgebinder/edgebinder-laminas-component)
+[![PHP Version Require](https://poser.pugx.org/edgebinder/edgebinder-laminas-component/require/php)](https://packagist.org/packages/edgebinder/edgebinder-laminas-component)
 
 A Laminas/Mezzio integration component for [EdgeBinder](https://github.com/EdgeBinder/edgebinder) - A lightweight, storage-agnostic relationship management library for PHP 8.3+.
 
@@ -30,7 +30,7 @@ A Laminas/Mezzio integration component for [EdgeBinder](https://github.com/EdgeB
 Install via Composer:
 
 ```bash
-composer require edgebinder/laminas-component
+composer require edgebinder/edgebinder-laminas-component
 ```
 
 ## Quick Start
@@ -54,7 +54,7 @@ $aggregator = new ConfigAggregator([
 Copy the configuration template and customize it:
 
 ```bash
-cp vendor/edgebinder/laminas-component/config/edgebinder.global.php.dist config/autoload/edgebinder.local.php
+cp vendor/edgebinder/edgebinder-laminas-component/config/edgebinder.global.php.dist config/autoload/edgebinder.local.php
 ```
 
 Or create configuration file manually:
@@ -223,6 +223,6 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENS
 
 ## Support
 
-- [GitHub Issues](https://github.com/EdgeBinder/edgebinder-component/issues)
+- [GitHub Issues](https://github.com/EdgeBinder/edgebinder-laminas-component/issues)
 - [Documentation](https://edgebinder.dev/docs)
-- [Community Discussions](https://github.com/EdgeBinder/edgebinder-component/discussions)
+- [Community Discussions](https://github.com/EdgeBinder/edgebinder-laminas-component/discussions)

@@ -16,8 +16,8 @@ Thank you for your interest in contributing to the EdgeBinder Laminas Component!
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/your-username/edgebinder-component.git
-   cd edgebinder-component
+   git clone https://github.com/your-username/edgebinder-laminas-component.git
+   cd edgebinder-laminas-component
    ```
 
 3. Install dependencies:

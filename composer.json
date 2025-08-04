@@ -1,5 +1,5 @@
 {
-    "name": "edgebinder/laminas-component",
+    "name": "edgebinder/edgebinder-laminas-component",
     "description": "Laminas/Mezzio integration component for EdgeBinder - A lightweight, storage-agnostic relationship management library",
     "license": "Apache-2.0",
     "type": "library",
@@ -20,10 +20,10 @@
             "email": "team@edgebinder.dev"
         }
     ],
-    "homepage": "https://github.com/EdgeBinder/edgebinder-component",
+    "homepage": "https://github.com/EdgeBinder/edgebinder-laminas-component",
     "support": {
-        "issues": "https://github.com/EdgeBinder/edgebinder-component/issues",
-        "source": "https://github.com/EdgeBinder/edgebinder-component"
+        "issues": "https://github.com/EdgeBinder/edgebinder-laminas-component/issues",
+        "source": "https://github.com/EdgeBinder/edgebinder-laminas-component"
     },
     "require": {
         "php": "^8.3",

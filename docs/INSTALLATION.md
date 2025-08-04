@@ -13,7 +13,7 @@ This guide covers the installation and setup of the EdgeBinder Laminas Component
 ### 1. Install via Composer
 
 ```bash
-composer require edgebinder/laminas-component
+composer require edgebinder/edgebinder-laminas-component
 ```
 
 This will automatically install the required dependencies:
@@ -187,7 +187,7 @@ php test-installation.php
 If you want to run the component's tests:
 
 ```bash
-cd vendor/edgebinder/laminas-component
+cd vendor/edgebinder/edgebinder-laminas-component
 composer install
 composer test
 ```
@@ -215,9 +215,9 @@ composer test
 
 ### Getting Help
 
-- [GitHub Issues](https://github.com/EdgeBinder/edgebinder-component/issues)
+- [GitHub Issues](https://github.com/EdgeBinder/edgebinder-laminas-component/issues)
 - [EdgeBinder Documentation](https://edgebinder.dev/docs)
-- [Community Discussions](https://github.com/EdgeBinder/edgebinder-component/discussions)
+- [Community Discussions](https://github.com/EdgeBinder/edgebinder-laminas-component/discussions)
 
 ## Next Steps
 

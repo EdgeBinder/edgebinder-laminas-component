@@ -7,7 +7,7 @@ The EdgeBinder Laminas Component provides seamless integration between EdgeBinde
 
 ### Installation
 ```bash
-composer require edgebinder/laminas-component
+composer require edgebinder/edgebinder-laminas-component
 ```
 
 ### Basic Setup
