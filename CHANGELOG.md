@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-08-06
+
+### Fixed
+- **CRITICAL**: Fixed EdgeBinder dependency constraint to allow v0.4.0 compatibility
+  - Changed constraint from `^0.2` to `>=0.2.0 <1.0.0` to resolve installation conflicts
+  - Resolves issue where applications using EdgeBinder ^0.4 couldn't install this component
+  - Ensures compatibility with EdgeBinder v0.2.0+ through v0.4.0+ and future versions
+
 ## [0.2.0] - 2025-08-06
 
 ### Added
@@ -56,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Token-based authentication for Codecov integration
 - Security audit integration in CI pipeline
 
-[Unreleased]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/EdgeBinder/edgebinder-laminas-component/releases/tag/v0.1.0
