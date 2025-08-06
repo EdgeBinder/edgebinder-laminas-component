@@ -7,13 +7,13 @@ namespace EdgeBinder\Component\Test;
 use EdgeBinder\Component\ConfigProvider;
 use EdgeBinder\Component\Factory\EdgeBinderFactory;
 use EdgeBinder\EdgeBinder;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test case for ConfigProvider class.
- *
- * @covers \EdgeBinder\Component\ConfigProvider
  */
+#[CoversClass(ConfigProvider::class)]
 final class ConfigProviderTest extends TestCase
 {
     private ConfigProvider $configProvider;

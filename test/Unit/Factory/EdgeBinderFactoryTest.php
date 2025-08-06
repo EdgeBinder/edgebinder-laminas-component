@@ -9,14 +9,14 @@ use EdgeBinder\Component\Factory\EdgeBinderFactory;
 use EdgeBinder\EdgeBinder;
 use EdgeBinder\Persistence\InMemory\InMemoryAdapterFactory;
 use EdgeBinder\Registry\AdapterRegistry;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**
  * Test case for EdgeBinderFactory class.
- *
- * @covers \EdgeBinder\Component\Factory\EdgeBinderFactory
  */
+#[CoversClass(EdgeBinderFactory::class)]
 final class EdgeBinderFactoryTest extends TestCase
 {
     private EdgeBinderFactory $factory;

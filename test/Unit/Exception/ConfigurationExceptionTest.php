@@ -6,13 +6,13 @@ namespace EdgeBinder\Component\Test\Exception;
 
 use EdgeBinder\Component\Exception\ConfigurationException;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test case for ConfigurationException class.
- *
- * @covers \EdgeBinder\Component\Exception\ConfigurationException
  */
+#[CoversClass(ConfigurationException::class)]
 final class ConfigurationExceptionTest extends TestCase
 {
     public function testExtendsInvalidArgumentException(): void

@@ -29,9 +29,6 @@ final class EdgeBinderIntegrationTest extends TestCase
         AdapterRegistry::clear();
     }
 
-    /**
-     * @covers \EdgeBinder\Component\Factory\EdgeBinderFactory
-     */
     public function testEdgeBinderCreationWithInMemoryAdapter(): void
     {
         $config = [
@@ -57,9 +54,6 @@ final class EdgeBinderIntegrationTest extends TestCase
         $this->assertInstanceOf(EdgeBinder::class, $edgeBinder);
     }
 
-    /**
-     * @covers \EdgeBinder\Component\Factory\EdgeBinderFactory
-     */
     public function testNamedInstanceCreationWithInMemoryAdapter(): void
     {
         $config = [
