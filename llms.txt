@@ -49,7 +49,7 @@ class MyService
 ## Adapters
 
 ### Built-in Adapters
-- **InMemoryAdapter** (`inmemory`) - Included with EdgeBinder core v0.2.0+, perfect for testing
+- **InMemoryAdapter** (`inmemory`) - Included with EdgeBinder core v0.9.0+, perfect for testing
 
 ### External Adapters (separate packages)
 - **WeaviateAdapter** (`weaviate`) - Install `edgebinder/weaviate-adapter` for vector databases
@@ -124,7 +124,7 @@ $edgeBinder = $container->get(EdgeBinder::class);
 ## Requirements
 - PHP 8.3+
 - Laminas ServiceManager 3.0+ or 4.0+
-- EdgeBinder ^0.2.0 (includes InMemoryAdapter)
+- EdgeBinder ^0.9.0 (includes InMemoryAdapter)
 
 ## Documentation
 - docs/INSTALLATION.md - Detailed installation guide

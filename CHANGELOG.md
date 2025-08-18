@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-08-18
+
+### Changed
+- **BREAKING**: Updated EdgeBinder Core dependency to `^0.9.0` for compatibility with latest API changes
+- **BREAKING**: EdgeBinderFactory now creates `AdapterConfiguration` objects instead of arrays
+- Updated `buildAdapterConfig()` method to return `AdapterConfiguration` objects for EdgeBinder Core v0.9.0+ compatibility
+
+### Fixed
+- **CRITICAL**: Fixed `TypeError` when using EdgeBinder Core v0.9.0+
+  - `AdapterRegistry::create()` now receives proper `AdapterConfiguration` objects instead of arrays
+  - Resolves: "Argument #2 ($config) must be of type EdgeBinder\Registry\AdapterConfiguration, array given"
+- Compatibility issues between EdgeBinder Laminas Component and EdgeBinder Core v0.9.0+
+
+### Added
+- New integration test `EdgeBinderCoreCompatibilityTest` to verify v0.9.0+ compatibility
+- Enhanced unit tests to verify `AdapterConfiguration` object creation
+- Import for `EdgeBinder\Registry\AdapterConfiguration` class
+
+### Removed
+- Backward compatibility with EdgeBinder Core versions prior to v0.9.0 (breaking change acceptable in pre-1.0)
+
 ## [0.2.1] - 2025-08-06
 
 ### Fixed
@@ -64,7 +85,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Token-based authentication for Codecov integration
 - Security audit integration in CI pipeline
 
-[Unreleased]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/EdgeBinder/edgebinder-laminas-component/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/EdgeBinder/edgebinder-laminas-component/releases/tag/v0.1.0

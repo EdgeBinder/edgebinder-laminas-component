@@ -6,7 +6,7 @@ This guide covers the installation and setup of the EdgeBinder Laminas Component
 
 - PHP 8.3 or higher
 - Laminas ServiceManager 3.0+ or 4.0+
-- EdgeBinder ^0.2.0 (includes InMemoryAdapter for testing)
+- EdgeBinder ^0.9.0 (includes InMemoryAdapter for testing)
 
 ## Installation
 

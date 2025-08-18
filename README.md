@@ -23,7 +23,7 @@ A Laminas/Mezzio integration component for [EdgeBinder](https://github.com/EdgeB
 
 - PHP 8.3+
 - Laminas ServiceManager 3.0+ or 4.0+
-- EdgeBinder ^0.2.0 (includes InMemoryAdapter for testing)
+- EdgeBinder ^0.9.0 (includes InMemoryAdapter for testing)
 
 ## Installation
 
@@ -84,7 +84,7 @@ EdgeBinder uses a self-determining adapter architecture. Adapters register thems
 
 ### Built-in Adapters
 
-- **InMemoryAdapter** (`inmemory`) - Included with EdgeBinder core v0.2.0+, perfect for testing and development
+- **InMemoryAdapter** (`inmemory`) - Included with EdgeBinder core v0.9.0+, perfect for testing and development
 
 ### Available Adapters
 
