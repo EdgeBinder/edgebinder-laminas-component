@@ -40,8 +40,6 @@ jobs:
 
     name: PHP ${{ matrix.php-version }} - ServiceManager ${{ matrix.servicemanager-version }} - PSR-11 ${{ matrix.psr-container-version }}
 
-
-
     steps:
     - uses: actions/checkout@v4
 

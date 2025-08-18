@@ -7,6 +7,7 @@ namespace EdgeBinder\Component\Factory;
 use EdgeBinder\Component\Exception\ConfigurationException;
 use EdgeBinder\Contracts\PersistenceAdapterInterface;
 use EdgeBinder\EdgeBinder;
+use EdgeBinder\Registry\AdapterConfiguration;
 use EdgeBinder\Registry\AdapterRegistry;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerInterface;
@@ -181,17 +182,17 @@ final class EdgeBinderFactory implements FactoryInterface
      * @param array<string, mixed> $globalConfig
      * @param ContainerInterface $container
      *
-     * @return array<string, mixed>
+     * @return AdapterConfiguration
      */
     private function buildAdapterConfig(
         array $instanceConfig,
         array $globalConfig,
         ContainerInterface $container
-    ): array {
-        return [
-            'instance' => $instanceConfig,
-            'global' => $globalConfig,
-            'container' => $container,
-        ];
+    ): AdapterConfiguration {
+        return new AdapterConfiguration(
+            $instanceConfig,
+            $globalConfig,
+            $container
+        );
     }
 }
